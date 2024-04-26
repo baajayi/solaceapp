@@ -1,0 +1,11 @@
+llama_index.readers.youtube_transcript
+llama-index 
+llama-index.core
+llama-index-llms-openai
+openai
+gradio
+pymilvus
+python-dotenv
+langchain
+langchain-community==0.0.24
+chromadb
