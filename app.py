@@ -8,13 +8,11 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.embeddings.openai import OpenAIEmbeddings
-from llama_index.core import StorageContext
-from llama_index.core import VectorStoreIndex, Settings
 from openai import OpenAI
 from langchain.chat_models import ChatOpenAI
 from dotenv import load_dotenv, find_dotenv
 import gradio as gr
-from pymilvus import connections
+
 
 _ = load_dotenv(find_dotenv())
 openai_api_key = os.getenv("OPENAI_API_KEY")
