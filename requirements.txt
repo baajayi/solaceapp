@@ -1,4 +1,5 @@
 Flask
+gradio
 openai
 numpy
 youtube_transcript_api
