@@ -74,7 +74,7 @@ def save_embeddings_to_npy(embeddings, filename):
     print(f"Embeddings saved to {filename}")
 
 def load_embeddings_from_json(filename):
-    with open(filename, 'r') as f):
+    with open(filename, 'r') as f:
         embeddings = json.load(f)
     return embeddings
 
