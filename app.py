@@ -1,4 +1,3 @@
-import threading
 from flask import Flask, request, jsonify, render_template
 from openai import OpenAI
 import os
@@ -9,7 +8,6 @@ import tiktoken
 from youtube_transcript_api import YouTubeTranscriptApi
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv, find_dotenv
-import gradio as gr
 
 app = Flask(__name__)
 
@@ -76,7 +74,7 @@ def save_embeddings_to_npy(embeddings, filename):
     print(f"Embeddings saved to {filename}")
 
 def load_embeddings_from_json(filename):
-    with open(filename, 'r') as f:
+    with open(filename, 'r') as f):
         embeddings = json.load(f)
     return embeddings
 
@@ -156,17 +154,6 @@ def get_retrieval_augmented_response(prompt, model="text-embedding-ada-002"):
     except Exception as e:
         return f"An error occurred: {str(e)}"
 
-def gradio_interface(query):
-    return get_retrieval_augmented_response(query)
-
-gradio_app = gr.Interface(
-    fn=gradio_interface,
-    inputs=gr.Textbox(lines=2, placeholder="Enter your Question here..."),
-    outputs=gr.TextArea(),
-    title="VIVE AI Assistant",
-    description="Ask questions and get responses inspired by VIVE Church."
-)
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -178,18 +165,5 @@ def ask():
     response = get_retrieval_augmented_response(query)
     return jsonify({"response": response})
 
-def run_flask():
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
-def run_gradio():
-    gradio_app.launch(server_name="0.0.0.0", server_port=7860, share=True)
-
 if __name__ == "__main__":
-    flask_thread = threading.Thread(target=run_flask)
-    gradio_thread = threading.Thread(target=run_gradio)
-
-    flask_thread.start()
-    gradio_thread.start()
-
-    flask_thread.join()
-    gradio_thread.join()
+    app.run(host='0.0.0.0', port=5000, debug=True)
