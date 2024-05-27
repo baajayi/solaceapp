@@ -8,8 +8,10 @@ import tiktoken
 from youtube_transcript_api import YouTubeTranscriptApi
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv, find_dotenv
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS
 
 _ = load_dotenv(find_dotenv())
 openai_api_key = os.getenv("OPENAI_API_KEY")
