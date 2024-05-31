@@ -1,6 +1,4 @@
 Flask
-gradio
-flask_cors
 openai
 numpy
 youtube_transcript_api

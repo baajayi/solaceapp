@@ -4,6 +4,7 @@ import os
 import json
 import concurrent.futures
 import numpy as np
+from llama_index.core import SimpleDirectoryReader
 import tiktoken
 from youtube_transcript_api import YouTubeTranscriptApi
 from sklearn.metrics.pairwise import cosine_similarity
@@ -18,29 +19,14 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 docs = []
 links = [
-    "https://www.youtube.com/watch?v=jMPP8RH3-MQ",
-    "https://www.youtube.com/watch?v=8DIveZcmcnA",
-    "https://www.youtube.com/watch?v=CnWKIUA811s",
-    "https://www.youtube.com/watch?v=ADPaOBzaZLo",
-    "https://www.youtube.com/watch?v=oZw67iS4rYA",
-    "https://www.youtube.com/watch?v=y7UN3MY-LIs",
-    "https://www.youtube.com/watch?v=L3ynZBaWHmk",
-    "https://www.youtube.com/watch?v=gv6WCCWZC14",
-    "https://www.youtube.com/watch?v=LoSpNWFzF-k",
-    "https://www.youtube.com/watch?v=w_osZN17DLw",
-    "https://www.youtube.com/watch?v=r6OqRIQzDA8",
-    "https://www.youtube.com/watch?v=q0DVDVcXFYk",
-    "https://www.youtube.com/watch?v=unZf8wZZXkw",
-    "https://www.youtube.com/watch?v=co2KJ9zKNbA",
-    "https://www.youtube.com/watch?v=vqf2mnf8PUg",
-    "https://www.youtube.com/watch?v=KN5kekYwmUc",
-    "https://www.youtube.com/watch?v=-HtFRj8jnSU",
-    "https://www.youtube.com/watch?v=BtLkQmhg2RU",
-    "https://www.youtube.com/watch?v=NRffr8LanRU",
-    "https://www.youtube.com/watch?v=6SkY8pG6lHk"
+    'https://www.youtube.com/watch?v=YmnOW8vR7is&t=123s'
 ]
 
 youtube_links = [link.split("=")[1] for link in links]
+
+def load_markdown_files(directory):
+    reader = SimpleDirectoryReader(directory)
+    return reader.load_data()
 
 def get_transcript(video_id):
     transcript = YouTubeTranscriptApi.get_transcript(video_id)
@@ -86,26 +72,33 @@ def load_embeddings_from_npy(filename):
 def is_valid_embedding(embedding):
     return np.all(np.isfinite(embedding))
 
-embeddings_file = 'vivembeddings.npy'
-document_texts_file = 'vivdocument_texts.json'
+embeddings_file = 'covmbeddings.npy'
+document_texts_file = 'covdocument_texts.json'
 
 if os.path.exists(embeddings_file) and os.path.exists(document_texts_file):
     all_embeddings = load_embeddings_from_npy(embeddings_file)
     with open(document_texts_file, 'r') as f:
         document_texts = json.load(f)
 else:
+    # Fetch and handle future results concurrently
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_transcripts = executor.map(get_transcript, youtube_links)
-        docs.extend(future_transcripts)
-    
+        future_transcripts = list(executor.map(get_transcript, youtube_links))
+        future_docs = executor.submit(load_markdown_files, "MDFiles").result()
+
+    docs.extend(future_transcripts)
+    docs.extend(future_docs)
+
+    # Process each document
     all_embeddings = []
     document_texts = []
     for doc in docs:
-        text_chunks = split_text(doc, max_tokens=8192)
-        embeddings = get_embeddings_for_text_chunks(text_chunks)
-        all_embeddings.extend(embeddings)
-        document_texts.extend(text_chunks)
+        if isinstance(doc, str):  # Ensure doc is a string
+            text_chunks = split_text(doc, max_tokens=8192)
+            embeddings = get_embeddings_for_text_chunks(text_chunks)
+            all_embeddings.extend(embeddings)
+            document_texts.extend(text_chunks)
     
+    # Save embeddings and texts
     save_embeddings_to_npy(all_embeddings, embeddings_file)
     with open(document_texts_file, 'w') as f:
         json.dump(document_texts, f)
@@ -143,11 +136,11 @@ def get_retrieval_augmented_response(prompt, model="text-embedding-ada-002"):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": """You are a spiritual assistant. You have the context of sermons by Pastor Adam Smallcombe of the VIVE Church. 
-                 Your role is to answer questions in a personal, warm, and engaging manner that reflects the style and tone of Pastor Adam Smallcombe, 
+                {"role": "system", "content": """You are a spiritual assistant. You have the context of content from The Evangelical Covenant Church. 
+                 Your role is to answer questions in a personal, warm, and engaging manner that portrays the style, personality, and tone of Pastor Larry Kim of the Local Central Church, 
                  but without repeating the sermons. Directly address the person asking the question, offering guidance and scriptural references as appropriate.
-                 Also leverage recent sermons and community activities relevant to the question asked.
                  Ensure the response is conversational and focused on the individual's query, providing support and encouragement in the spirit of the sermons. 
+                 Leverage the Six affirmations on https://covchurch.org/who-we-are/beliefs/ and any recent sermon or community activities to provide relevant response.
                  Use the following context to help shape your response:"""},
                 {"role": "user", "content": context.strip()},
                 {"role": "user", "content": prompt}
@@ -169,5 +162,4 @@ def ask():
     return jsonify({"response": response})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000, debug=True)
