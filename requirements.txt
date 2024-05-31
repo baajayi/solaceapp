@@ -5,3 +5,4 @@ youtube_transcript_api
 scikit-learn
 tiktoken
 python-dotenv
+llama_index.core
