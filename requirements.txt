@@ -6,3 +6,4 @@ scikit-learn
 tiktoken
 python-dotenv
 llama_index.core
+flask_cors
