@@ -1,0 +1,38 @@
+.response-display {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-width: 600px;
+    margin: 10px auto;
+    background-color: #f9f9f9;
+  }
+  
+  .response-display p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    max-height: 150px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .response-display p.expanded {
+    max-height: none;
+  }
+  
+  .toggle-button {
+    display: block;
+    margin: 10px 0 0;
+    padding: 5px 10px;
+    font-size: 14px;
+    color: #007bff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  .toggle-button:hover {
+    color: #0056b3;
+  }
+  

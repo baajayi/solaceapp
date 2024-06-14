@@ -1,0 +1,25 @@
+.App {
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+main {
+  padding: 20px;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.pastor-headshot {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+footer {
+  margin-top: 20px;
+  font-style: italic;
+  color: grey;
+}

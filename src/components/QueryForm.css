@@ -1,0 +1,28 @@
+.query-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .query-form input {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    width: 300px;
+  }
+  
+  .query-form button {
+    padding: 10px 20px;
+    background-color: grey;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .query-form button:hover {
+    background-color: darkgrey;
+  }
+  

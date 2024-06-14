@@ -1,0 +1,13 @@
+.header {
+    background-color: grey;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    width: 50px;
+    margin-right: 10px;
+  }
+  
